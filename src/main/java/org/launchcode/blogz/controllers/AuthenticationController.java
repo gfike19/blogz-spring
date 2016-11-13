@@ -21,6 +21,21 @@ public class AuthenticationController extends AbstractController {
 	public String signup(HttpServletRequest request, Model model) {
 		
 		// TODO - implement signup
+		String uname = request.getParameter("username");
+		String pwd = request.getParameter("password");
+		String error = "";
+		
+		User u = new User (uname,pwd);
+		
+		while(!u.isValidUsername(uname)) {
+			error += "Invalid username. Enter another one. \n";
+			uname = request.getParameter("username");
+		}
+		
+		while(!u.isValidPassword(pwd)) {
+			error += "Invalid password. Choose another one. \n";
+			pwd = request.getParameter("password");
+		}
 		
 		return "redirect:blog/newpost";
 	}
