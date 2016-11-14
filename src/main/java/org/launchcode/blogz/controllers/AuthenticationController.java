@@ -4,6 +4,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.launchcode.blogz.models.User;
+import org.launchcode.blogz.models.dao.UserDao;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,23 +20,17 @@ public class AuthenticationController extends AbstractController {
 	
 	@RequestMapping(value = "/signup", method = RequestMethod.POST)
 	public String signup(HttpServletRequest request, Model model) {
-		
 		// TODO - implement signup
 		String uname = request.getParameter("username");
 		String pwd = request.getParameter("password");
 		
 		User u = new User (uname,pwd);
 		
-		while(!u.isValidUsername(uname)) {
-			uname = request.getParameter("username");
+		if (u.isValidUsername(uname) && u.isValidPassword(pwd)) {
+			model.addAttribute("username", uname);
+			model.addAttribute("password", pwd);
 		}
-		
-		while(!u.isValidPassword(pwd)) {
-			pwd = request.getParameter("password");
-		}
-		
-		model.addAttribute("username");
-		model.addAttribute("password");
+				
 		return "redirect:blog/newpost";
 	}
 	
@@ -48,12 +43,6 @@ public class AuthenticationController extends AbstractController {
 	public String login(HttpServletRequest request, Model model) {
 		
 		// TODO - implement login
-		String uname = request.getParameter("username");
-		String pwd = request.getParameter("password");
-		User u = new User(uname, pwd);
-		while (!u.isMatchingPassword(pwd)) {
-			pwd = request.getParameter("password");
-		}
 		
 		return "redirect:blog/newpost";
 	}
