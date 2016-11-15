@@ -27,4 +27,14 @@ public class BlogController extends AbstractController {
 		return "blog";
 	}
 	
+	@RequestMapping(value="/newpost")
+	public String blogNewPost (Model model) {
+		return "newpost";
+	}
+	
+	@RequestMapping(value="redirect:blog/newpost")
+	public String redirectNewPost(Model model){
+		return "newpost";
+	}
+	
 }
