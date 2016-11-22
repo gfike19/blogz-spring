@@ -29,28 +29,25 @@ public class AuthenticationController extends AbstractController {
 		String username_error = "";
 		String password_error = "";
 		String verify_error = "";
-		
 		User u = new User (uname,pwd);
-		
-		if (User.isValidUsername(uname) && User.isValidPassword(pwd) &&pwd.equals(vpwd)) {
-			HttpSession s = request.getSession();
-			model.addAttribute("username", uname);
-			model.addAttribute("password", pwd);
-			userDao.save(u);
-			setUserInSession(s, u);
-		} else if (!User.isValidUsername(uname)) {
-			username_error = "Invalid username. Select another one";
-			model.addAttribute("username_error", username_error);
+		try {
+				userDao.save(u);
+				HttpSession s = request.getSession();
+				setUserInSession(s, u);
+		}catch (IllegalArgumentException e) {
+			if(!User.isValidUsername(uname)) {
+				username_error = "Invalid username. Select another one";
+				model.addAttribute("username_error", username_error);
+			}
+			else if (!User.isValidPassword(pwd)) {
+				password_error = "Invalid password. Enter another one.";
+				model.addAttribute("password_error", password_error);
+			} else if (!pwd.equals(vpwd)) {
+				verify_error = "Passwords do match. Reenter them.";
+				model.addAttribute("verify_error", verify_error);
+			}
 			return "signup";
-		} else if (!User.isValidPassword(pwd)) {
-			password_error = "Invalid password. Enter another one.";
-			model.addAttribute("password_error", password_error);
-			return "signup";
-		} else if (!pwd.equals(vpwd)) {
-			verify_error = "Passwords do match. Reenter them.";
-			model.addAttribute("verify_error", verify_error);
-			return "signup";
-		} 
+		}
 		
 		return "redirect:blog/newpost";
 	}
@@ -65,16 +62,16 @@ public class AuthenticationController extends AbstractController {
 	public String login(HttpServletRequest request, Model model) {
 		
 		//  - implement login
-		HttpSession s = request.getSession();
 		String uname = request.getParameter("username");
 		String pwd = request.getParameter("password");
-		User u = new User(uname,pwd);
-		User db_u = userDao.findByUid(u.getUid());
-		if (u.getPwHash().equals(db_u.getPwHash())) {
-		setUserInSession(s, u);
+		User db_u = userDao.findByUsername(uname);
+		
+		if(db_u.isMatchingPassword(pwd)) {
+			HttpSession s = request.getSession();
+			setUserInSession(s, db_u);
 		}
 		else {
-			String verify_error = "Incorrect password";
+			String verify_error = "Passwords do match. Reenter them.";
 			model.addAttribute("verify_error", verify_error);
 		}
 		return "redirect:blog/newpost";
