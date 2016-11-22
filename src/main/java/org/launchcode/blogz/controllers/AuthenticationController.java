@@ -41,12 +41,15 @@ public class AuthenticationController extends AbstractController {
 		} else if (!User.isValidUsername(uname)) {
 			username_error = "Invalid username. Select another one";
 			model.addAttribute("username_error", username_error);
+			return "signup";
 		} else if (!User.isValidPassword(pwd)) {
 			password_error = "Invalid password. Enter another one.";
 			model.addAttribute("password_error", password_error);
+			return "signup";
 		} else if (!pwd.equals(vpwd)) {
 			verify_error = "Passwords do match. Reenter them.";
 			model.addAttribute("verify_error", verify_error);
+			return "signup";
 		} 
 		
 		return "redirect:blog/newpost";
@@ -62,9 +65,18 @@ public class AuthenticationController extends AbstractController {
 	public String login(HttpServletRequest request, Model model) {
 		
 		//  - implement login
-
-			HttpSession s = request.getSession();
-			User u = getUserFromSession(s);
+		HttpSession s = request.getSession();
+		String uname = request.getParameter("username");
+		String pwd = request.getParameter("password");
+		User u = new User(uname,pwd);
+		User db_u = userDao.findByUid(u.getUid());
+		if (u.getPwHash().equals(db_u.getPwHash())) {
+		setUserInSession(s, u);
+		}
+		else {
+			String verify_error = "Incorrect password";
+			model.addAttribute("verify_error", verify_error);
+		}
 		return "redirect:blog/newpost";
 	}
 	
