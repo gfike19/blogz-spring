@@ -26,29 +26,31 @@ public class AuthenticationController extends AbstractController {
 		String uname = request.getParameter("username"); //when using with static vars use class not instance, User not u
 		String pwd = request.getParameter("password");
 		String vpwd = request.getParameter("verify");
-		String username_error = "";
-		String password_error = "";
-		String verify_error = "";
-		User u = new User (uname,pwd);
-		try {
-				userDao.save(u);
-				HttpSession s = request.getSession();
-				setUserInSession(s, u);
-		}catch (IllegalArgumentException e) {
-			if(!User.isValidUsername(uname)) {
-				username_error = "Invalid username. Select another one";
-				model.addAttribute("username_error", username_error);
-			}
-			else if (!User.isValidPassword(pwd)) {
-				password_error = "Invalid password. Enter another one.";
-				model.addAttribute("password_error", password_error);
-			} else if (!pwd.equals(vpwd)) {
-				verify_error = "Passwords do match. Reenter them.";
-				model.addAttribute("verify_error", verify_error);
-			}
+		
+		if(uname == null || uname == "" || !User.isValidUsername(uname)) {
+			String username_error = "Invalid username. Select another one";
+			model.addAttribute("username_error", username_error);
+			return "signup";
+		}
+		model.addAttribute("username", uname);
+		
+		if (!User.isValidPassword(pwd)) {
+			String password_error = "Invalid password. Enter another one.";
+			model.addAttribute("password_error", password_error);
 			return "signup";
 		}
 		
+		if (!vpwd.equals(pwd)) {
+			String verify_error = "Passwords do not match. Reenter them.";
+			model.addAttribute("verify_error", verify_error);
+			return "signup";
+		}
+		
+		HttpSession s = request.getSession();
+		User u = new User(uname,pwd);
+		userDao.save(u);
+		getUserFromSession(s);
+		setUserInSession(s,u);
 		return "redirect:blog/newpost";
 	}
 	
@@ -71,8 +73,10 @@ public class AuthenticationController extends AbstractController {
 			setUserInSession(s, db_u);
 		}
 		else {
+			model.addAttribute("username", uname);
 			String verify_error = "Passwords do match. Reenter them.";
 			model.addAttribute("verify_error", verify_error);
+			return "login";
 		}
 		return "redirect:blog/newpost";
 	}
@@ -92,4 +96,5 @@ public class AuthenticationController extends AbstractController {
 	public String error (HttpServletRequest request, Model model) {
 		return "error";
 	}
+	
 }

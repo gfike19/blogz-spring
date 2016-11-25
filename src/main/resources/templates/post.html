@@ -6,7 +6,9 @@
 
 	<div th:replace="template :: navigation"></div>
 
-	<!-- TODO - display a single blog post -->
+	<!-- display a single blog post -->
+	<h3 th:text="${title}"></h3>
+	<p th:text="${body}"></p>
 
 </body>
 </html>

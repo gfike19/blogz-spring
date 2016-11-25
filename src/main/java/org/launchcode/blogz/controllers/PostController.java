@@ -3,6 +3,7 @@ package org.launchcode.blogz.controllers;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.launchcode.blogz.models.Post;
 import org.launchcode.blogz.models.User;
@@ -23,8 +24,21 @@ public class PostController extends AbstractController {
 	@RequestMapping(value = "/blog/newpost", method = RequestMethod.POST)
 	public String newPost(HttpServletRequest request, Model model) {
 		
-		// TODO - implement newPost
+		// implement newPost
+		String title = request.getParameter("title");
+		String body = request.getParameter("body");
 		
+		if(title == "" || title == null || body == "" || body == null) {
+			String error = "One or more fields are empty";
+			model.addAttribute("value", title);
+			model.addAttribute("body", body);
+			model.addAttribute("error", error);
+			return "newpost";
+		}
+		HttpSession s = request.getSession();
+		User u = getUserFromSession(s);
+		Post p = new Post(title,body,u);
+		postDao.save(p);
 		
 		return "redirect:index"; // TODO - this redirect should go to the new post's page  		
 	}
