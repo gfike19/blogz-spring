@@ -40,13 +40,14 @@ public class PostController extends AbstractController {
 		Post p = new Post(title,body,u);
 		postDao.save(p);
 		
-		return "redirect:index"; // TODO - this redirect should go to the new post's page  		
+		return "redirect:blog/{username}/{uid}"; // TODO - this redirect should go to the new post's page  		
 	}
 	
 	@RequestMapping(value = "/blog/{username}/{uid}", method = RequestMethod.GET)
 	public String singlePost(@PathVariable String username, @PathVariable int uid, Model model) {
 		
 		// TODO - implement singlePost
+		
 		
 		return "post";
 	}
