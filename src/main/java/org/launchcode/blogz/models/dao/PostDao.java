@@ -16,6 +16,6 @@ public interface PostDao extends CrudRepository<Post, Integer> {
     
     // TODO - add method signatures as needed
     Post findByUid(int uid);
-    Post findByAuthorUid(int author_uid);
+    List<Post> findByAuthorUid(int author_uid);
 	
 }

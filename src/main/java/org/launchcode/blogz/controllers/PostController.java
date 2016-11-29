@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class PostController extends AbstractController {
 
+	private List<Post> posts;
+
 	@RequestMapping(value = "/blog/newpost", method = RequestMethod.GET)
 	public String newPostForm() {
 		return "newpost";
@@ -40,7 +42,7 @@ public class PostController extends AbstractController {
 		Post p = new Post(title,body,u);
 		postDao.save(p);
 		
-		return "redirect:blog/{username}/{uid}"; // this redirect should go to the new post's page  		
+		return "post"; // this redirect should go to the new post's page  		
 	}
 	
 	@RequestMapping(value = "/blog/{username}/{uid}", method = RequestMethod.GET)
@@ -59,10 +61,11 @@ public class PostController extends AbstractController {
 	@RequestMapping(value = "/blog/{username}", method = RequestMethod.GET)
 	public String userPosts(@PathVariable String username, Model model) {
 		
-		// TODO - implement userPosts
+		//implement userPosts
 		User u = userDao.findByUsername(username);
 		int author_uid = u.getUid();
-		Post p = postDao.findByAuthorUid(author_uid);
+		posts = postDao.findByAuthor(author_uid);
+		model.addAttribute("posts", posts);
 		
 		return "blog";
 	}
