@@ -40,16 +40,18 @@ public class PostController extends AbstractController {
 		Post p = new Post(title,body,u);
 		postDao.save(p);
 		
-		return "redirect:blog/{username}/{uid}"; // TODO - this redirect should go to the new post's page  		
+		return "redirect:blog/{username}/{uid}"; // this redirect should go to the new post's page  		
 	}
 	
 	@RequestMapping(value = "/blog/{username}/{uid}", method = RequestMethod.GET)
 	public String singlePost(@PathVariable String username, @PathVariable int uid, Model model) {
 		
-		// TODO - implement singlePost
+		// implement singlePost
 		Post p = postDao.findByUid(uid);
 		String title = p.getTitle();
 		String body = p.getBody();
+		model.addAttribute("title", title);
+		model.addAttribute("body", body);
 		
 		return "post";
 	}
@@ -58,6 +60,9 @@ public class PostController extends AbstractController {
 	public String userPosts(@PathVariable String username, Model model) {
 		
 		// TODO - implement userPosts
+		User u = userDao.findByUsername(username);
+		int author_uid = u.getUid();
+		Post p = postDao.findByAuthorUid(author_uid);
 		
 		return "blog";
 	}
