@@ -62,10 +62,7 @@ public class PostController extends AbstractController {
 	public String userPosts(@PathVariable String username, Model model) {
 		
 		//implement userPosts
-		User u = userDao.findByUsername(username);
-		int author_uid = u.getUid();
-		posts = postDao.findByAuthor(author_uid);
-		model.addAttribute("posts", posts);
+		
 		
 		return "blog";
 	}
