@@ -7,6 +7,7 @@ import javax.servlet.http.HttpSession;
 
 import org.launchcode.blogz.models.Post;
 import org.launchcode.blogz.models.User;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,8 +28,13 @@ public class PostController extends AbstractController {
 	public String newPost(HttpServletRequest request, Model model) {
 		
 		// implement newPost
+		try {
 		String title = request.getParameter("title");
 		String body = request.getParameter("body");
+		} catch (DataIntegrityViolationException e) {
+			String error = "Post is too long.";
+			model.addAttribute("error", error);
+		}
 		
 		if(title == "" || title == null || body == "" || body == null) {
 			String error = "One or more fields are empty";
@@ -37,12 +43,17 @@ public class PostController extends AbstractController {
 			model.addAttribute("error", error);
 			return "newpost";
 		}
+		
+		
 		HttpSession s = request.getSession();
 		User u = getUserFromSession(s);
 		Post p = new Post(title,body,u);
 		postDao.save(p);
+		int uid = p.getUid();
+		String username = u.getUsername();
 		
-		return "post"; // this redirect should go to the new post's page  		
+		
+		return String.format("redirect:blog%s/%s/", username, uid); // this redirect should go to the new post's page  		
 	}
 	
 	@RequestMapping(value = "/blog/{username}/{uid}", method = RequestMethod.GET)
@@ -54,7 +65,8 @@ public class PostController extends AbstractController {
 		String body = p.getBody();
 		model.addAttribute("title", title);
 		model.addAttribute("body", body);
-		
+		model.addAttribute("username", username);
+		model.addAttribute("post", p);
 		return "post";
 	}
 	
@@ -62,7 +74,9 @@ public class PostController extends AbstractController {
 	public String userPosts(@PathVariable String username, Model model) {
 		
 		//implement userPosts
-		
+		User u = userDao.findByUsername(username);
+		List <Post> posts = u.getPosts();
+		model.addAttribute("posts", posts);
 		
 		return "blog";
 	}

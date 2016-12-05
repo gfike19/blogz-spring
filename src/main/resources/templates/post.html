@@ -9,6 +9,7 @@
 	<!-- display a single blog post -->
 	<h3 th:text="${title}"></h3>
 	<p th:text="${body}"></p>
-
+	<p class="post-author">Created on <span th:text="${#dates.format(post.created, 'yyyy-MM-dd')}"></span> by <a th:href="'/blog/' + ${post.author.username}" th:text="${post.author.username}"></a></p>
+	
 </body>
 </html>

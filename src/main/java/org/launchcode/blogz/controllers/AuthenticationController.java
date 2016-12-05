@@ -26,9 +26,15 @@ public class AuthenticationController extends AbstractController {
 		String uname = request.getParameter("username"); //when using with static vars use class not instance, User not u
 		String pwd = request.getParameter("password");
 		String vpwd = request.getParameter("verify");
+		User db_u = userDao.findByUsername(uname);
 		
 		if(uname == null || uname == "" || !User.isValidUsername(uname)) {
 			String username_error = "Invalid username. Select another one";
+			model.addAttribute("username_error", username_error);
+			return "signup";
+		}
+		if (db_u != null) {
+			String username_error = "Username is already in use";
 			model.addAttribute("username_error", username_error);
 			return "signup";
 		}
@@ -66,8 +72,9 @@ public class AuthenticationController extends AbstractController {
 		//  - implement login
 		String uname = request.getParameter("username");
 		String pwd = request.getParameter("password");
-		User db_u = userDao.findByUsername(uname);
 		
+		User db_u = userDao.findByUsername(uname);
+		if (db_u != null) {
 		if(db_u.isMatchingPassword(pwd)) {
 			HttpSession s = request.getSession();
 			setUserInSession(s, db_u);
@@ -75,6 +82,12 @@ public class AuthenticationController extends AbstractController {
 		else {
 			model.addAttribute("username", uname);
 			String verify_error = "Passwords do match. Reenter them.";
+			model.addAttribute("verify_error", verify_error);
+			return "login";
+		}
+		}
+		else {
+			String verify_error = "Invalid username";
 			model.addAttribute("verify_error", verify_error);
 			return "login";
 		}
