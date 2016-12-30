@@ -34,7 +34,11 @@ public class PostController extends AbstractController {
 		} catch (DataIntegrityViolationException e) {
 			String error = "Post is too long.";
 			model.addAttribute("error", error);
+			return "newpost";
 		}
+		
+		String title = request.getParameter("title");
+		String body = request.getParameter("body");
 		
 		if(title == "" || title == null || body == "" || body == null) {
 			String error = "One or more fields are empty";
